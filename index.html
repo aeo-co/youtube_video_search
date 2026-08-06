@@ -1,451 +1,626 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YouTube Video Search</title>
-<style>
-  :root {
-    --bg: #0f1117;
-    --card: #181b23;
-    --card-hover: #1e222c;
-    --ink: #eef0f5;
-    --ink-2: #c2c7d2;
-    --ink-dim: #8a91a0;
-    --line: #272b36;
-    --line-2: #21252e;
-    --accent: #7d75f0;
-    --accent-ink: #ffffff;
-    --accent-soft: #262445;
-    --accent-softer: #1d1c30;
-    --link: #a29bff;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
-    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 30px rgba(0, 0, 0, 0.4);
-    --radius: 12px;
-    --radius-sm: 8px;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Video Search</title>
+    <style>
+      :root {
+        --bg: #0f1117;
+        --card: #181b23;
+        --card-hover: #1e222c;
+        --ink: #eef0f5;
+        --ink-2: #c2c7d2;
+        --ink-dim: #8a91a0;
+        --line: #272b36;
+        --line-2: #21252e;
+        --accent: #7d75f0;
+        --accent-ink: #ffffff;
+        --accent-soft: #262445;
+        --accent-softer: #1d1c30;
+        --link: #a29bff;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+        --shadow-lift:
+          0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 30px rgba(0, 0, 0, 0.4);
+        --radius: 12px;
+        --radius-sm: 8px;
+        --sans:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        --mono:
+          ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+      }
 
-  * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
 
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 14px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
 
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 96px; }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 40px 24px 96px;
+      }
 
-  /* ---- header ---- */
-  header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-  .logo {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    background: var(--accent);
-    display: grid; place-items: center;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(91, 83, 224, 0.28);
-  }
-  .logo svg { width: 20px; height: 20px; display: block; }
-  header h1 {
-    font-size: 20px;
-    font-weight: 650;
-    letter-spacing: -0.3px;
-    margin: 0;
-  }
-  header .tagline {
-    font-size: 13px;
-    color: var(--ink-dim);
-    margin-top: 1px;
-  }
+      /* ---- header ---- */
+      header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--accent);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(91, 83, 224, 0.28);
+      }
+      .logo svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+      }
+      header h1 {
+        font-size: 20px;
+        font-weight: 650;
+        letter-spacing: -0.3px;
+        margin: 0;
+      }
+      header .tagline {
+        font-size: 13px;
+        color: var(--ink-dim);
+        margin-top: 1px;
+      }
 
-  /* ---- search card ---- */
-  .search-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 22px;
-  }
+      /* ---- search card ---- */
+      .search-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 22px;
+      }
 
-  .search-row { display: flex; gap: 10px; }
-  .input-shell {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--bg);
-    border: 1.5px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 0 14px;
-    transition: border-color 0.14s, box-shadow 0.14s;
-  }
-  .input-shell:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-  .input-shell svg { width: 18px; height: 18px; color: var(--ink-dim); flex-shrink: 0; }
-  .input-shell input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    outline: none;
-    font-family: var(--sans);
-    font-size: 15px;
-    color: var(--ink);
-    padding: 13px 0;
-  }
-  .input-shell input::placeholder { color: var(--ink-dim); }
+      .search-row {
+        display: flex;
+        gap: 10px;
+      }
+      .input-shell {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--bg);
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 0 14px;
+        transition:
+          border-color 0.14s,
+          box-shadow 0.14s;
+      }
+      .input-shell:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+      .input-shell svg {
+        width: 18px;
+        height: 18px;
+        color: var(--ink-dim);
+        flex-shrink: 0;
+      }
+      .input-shell input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-family: var(--sans);
+        font-size: 15px;
+        color: var(--ink);
+        padding: 13px 0;
+      }
+      .input-shell input::placeholder {
+        color: var(--ink-dim);
+      }
 
-  button.run {
-    background: var(--accent);
-    color: var(--accent-ink);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 14.5px;
-    padding: 0 26px;
-    cursor: pointer;
-    transition: background 0.14s, transform 0.06s;
-    white-space: nowrap;
-  }
-  button.run:hover { background: #8f88f3; }
-  button.run:active { transform: translateY(1px); }
-  button.run:disabled { opacity: 0.5; cursor: default; }
+      button.run {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 14.5px;
+        padding: 0 26px;
+        cursor: pointer;
+        transition:
+          background 0.14s,
+          transform 0.06s;
+        white-space: nowrap;
+      }
+      button.run:hover {
+        background: #8f88f3;
+      }
+      button.run:active {
+        transform: translateY(1px);
+      }
+      button.run:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
 
-  /* ---- filters ---- */
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 18px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--line-2);
-  }
-  .filter { display: flex; flex-direction: column; gap: 6px; }
-  .filter label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-    color: var(--ink-dim);
-    text-transform: uppercase;
-  }
-  .filter select {
-    appearance: none;
-    background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23868c9c' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
-    border: 1.5px solid var(--line);
-    border-radius: var(--radius-sm);
-    color: var(--ink-2);
-    font-family: var(--sans);
-    font-size: 13.5px;
-    font-weight: 500;
-    padding: 9px 30px 9px 12px;
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.14s;
-  }
-  .filter select:hover { border-color: #3a3f4c; }
-  .filter select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+      /* ---- filters ---- */
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 18px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line-2);
+      }
+      .filter {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .filter label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        color: var(--ink-dim);
+        text-transform: uppercase;
+      }
+      .filter select {
+        appearance: none;
+        background: var(--card)
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23868c9c' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
+          no-repeat right 10px center;
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        color: var(--ink-2);
+        font-family: var(--sans);
+        font-size: 13.5px;
+        font-weight: 500;
+        padding: 9px 30px 9px 12px;
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.14s;
+      }
+      .filter select:hover {
+        border-color: #3a3f4c;
+      }
+      .filter select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
 
-  .toggle {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    cursor: pointer;
-    user-select: none;
-    padding-bottom: 8px;
-  }
-  .toggle input { display: none; }
-  .toggle .box {
-    width: 38px; height: 22px;
-    border-radius: 12px;
-    background: #363b47;
-    position: relative;
-    transition: background 0.16s;
-    flex-shrink: 0;
-  }
-  .toggle .box::after {
-    content: "";
-    position: absolute;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #e8eaf0;
-    top: 2px; left: 2px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    transition: transform 0.16s;
-  }
-  .toggle input:checked + .box { background: var(--accent); }
-  .toggle input:checked + .box::after { transform: translateX(16px); }
-  .toggle .txt { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+      .toggle {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        cursor: pointer;
+        user-select: none;
+        padding-bottom: 8px;
+      }
+      .toggle input {
+        display: none;
+      }
+      .toggle .box {
+        width: 38px;
+        height: 22px;
+        border-radius: 12px;
+        background: #363b47;
+        position: relative;
+        transition: background 0.16s;
+        flex-shrink: 0;
+      }
+      .toggle .box::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #e8eaf0;
+        top: 2px;
+        left: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        transition: transform 0.16s;
+      }
+      .toggle input:checked + .box {
+        background: var(--accent);
+      }
+      .toggle input:checked + .box::after {
+        transform: translateX(16px);
+      }
+      .toggle .txt {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-2);
+      }
 
-  /* ---- status bar ---- */
-  .statusbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 30px 2px 16px;
-    min-height: 30px;
-    gap: 16px;
-  }
-  .statusbar .meta { font-size: 13px; color: var(--ink-dim); }
-  .statusbar .meta b { color: var(--ink); font-weight: 650; }
+      /* ---- status bar ---- */
+      .statusbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 30px 2px 16px;
+        min-height: 30px;
+        gap: 16px;
+      }
+      .statusbar .meta {
+        font-size: 13px;
+        color: var(--ink-dim);
+      }
+      .statusbar .meta b {
+        color: var(--ink);
+        font-weight: 650;
+      }
 
-  button.export {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: var(--card);
-    color: var(--ink-2);
-    border: 1.5px solid var(--line);
-    border-radius: var(--radius-sm);
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 550;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: border-color 0.14s, color 0.14s, background 0.14s;
-  }
-  button.export svg { width: 15px; height: 15px; }
-  button.export:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-softer); }
-  button.export:disabled { opacity: 0.4; cursor: default; }
+      button.export {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--card);
+        color: var(--ink-2);
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 550;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition:
+          border-color 0.14s,
+          color 0.14s,
+          background 0.14s;
+      }
+      button.export svg {
+        width: 15px;
+        height: 15px;
+      }
+      button.export:hover:not(:disabled) {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-softer);
+      }
+      button.export:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
 
-  /* ---- results grid ---- */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-  }
-  .video {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: transform 0.14s, box-shadow 0.14s;
-    display: flex;
-    flex-direction: column;
-  }
-  .video:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
-  .video .thumb {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    background: var(--line-2);
-    display: block;
-  }
-  .video .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .video .body { padding: 13px 14px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-  .video .title {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--ink);
-    text-decoration: none;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .video .title:hover { color: var(--link); }
-  .video .channel { font-size: 12.5px; color: var(--ink-dim); }
-  .video .stats {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: auto;
-    padding-top: 4px;
-    font-size: 12px;
-    color: var(--ink-dim);
-  }
-  .video .views {
-    font-weight: 650;
-    color: var(--accent);
-    background: var(--accent-soft);
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11.5px;
-  }
-  .video .dot { color: var(--line); }
+      /* ---- results grid ---- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+      }
+      .video {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition:
+          transform 0.14s,
+          box-shadow 0.14s;
+        display: flex;
+        flex-direction: column;
+      }
+      .video:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lift);
+      }
+      .video .thumb {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        background: var(--line-2);
+        display: block;
+      }
+      .video .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .video .body {
+        padding: 13px 14px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+      }
+      .video .title {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--ink);
+        text-decoration: none;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .video .title:hover {
+        color: var(--link);
+      }
+      .video .channel {
+        font-size: 12.5px;
+        color: var(--ink-dim);
+      }
+      .video .stats {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 4px;
+        font-size: 12px;
+        color: var(--ink-dim);
+      }
+      .video .views {
+        font-weight: 650;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 11.5px;
+      }
+      .video .dot {
+        color: var(--line);
+      }
 
-  /* ---- states ---- */
-  .state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 70px 24px;
-    color: var(--ink-dim);
-    font-size: 14px;
-    background: var(--card);
-    border: 1px dashed var(--line);
-    border-radius: var(--radius);
-  }
-  .state .big { font-size: 15px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
-  .state.err { color: #ff9d90; border-color: #4a2b28; background: #241816; }
-  .state.err .big { color: #ff9d90; }
-  .spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2.5px solid var(--accent-soft);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: -3px;
-    margin-right: 9px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+      /* ---- states ---- */
+      .state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 70px 24px;
+        color: var(--ink-dim);
+        font-size: 14px;
+        background: var(--card);
+        border: 1px dashed var(--line);
+        border-radius: var(--radius);
+      }
+      .state .big {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink-2);
+        margin-bottom: 6px;
+      }
+      .state.err {
+        color: #ff9d90;
+        border-color: #4a2b28;
+        background: #241816;
+      }
+      .state.err .big {
+        color: #ff9d90;
+      }
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2.5px solid var(--accent-soft);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        vertical-align: -3px;
+        margin-right: 9px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-  @media (max-width: 640px) {
-    .wrap { padding: 28px 16px 72px; }
-    .search-row { flex-direction: column; }
-    button.run { padding: 13px; }
-    .grid { grid-template-columns: 1fr; }
-  }
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 6.5v11l9-5.5-9-5.5z" fill="#fff"/>
-      </svg>
+      @media (max-width: 640px) {
+        .wrap {
+          padding: 28px 16px 72px;
+        }
+        .search-row {
+          flex-direction: column;
+        }
+        button.run {
+          padding: 13px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="logo">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M8 6.5v11l9-5.5-9-5.5z" fill="#fff" />
+          </svg>
+        </div>
+        <div>
+          <h1>YouTube Video Search</h1>
+          <div class="tagline">
+            Search video titles by keyword for content research
+          </div>
+        </div>
+      </header>
+
+      <div class="search-card">
+        <div class="search-row">
+          <div class="input-shell">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="M21 21l-4.3-4.3" />
+            </svg>
+            <input
+              type="text"
+              id="keyword"
+              placeholder="Search a keyword in video titles…"
+              autocomplete="off"
+            />
+          </div>
+          <button class="run" id="runBtn">Search</button>
+        </div>
+
+        <div class="filters">
+          <div class="filter">
+            <label for="order">Sort by</label>
+            <select id="order">
+              <option value="relevance">Relevance</option>
+              <option value="viewCount">Views</option>
+              <option value="date">Newest</option>
+            </select>
+          </div>
+          <div class="filter">
+            <label for="dateRange">Published</label>
+            <select id="dateRange">
+              <option value="">Any time</option>
+              <option value="7">Past week</option>
+              <option value="30">Past month</option>
+              <option value="365">Past year</option>
+            </select>
+          </div>
+          <div class="filter">
+            <label for="maxResults">Fetch up to</label>
+            <select id="maxResults">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="filter">
+            <label for="minViews">Min views</label>
+            <select id="minViews">
+              <option value="0">Any</option>
+              <option value="10000">10K+</option>
+              <option value="100000">100K+</option>
+              <option value="1000000">1M+</option>
+            </select>
+          </div>
+          <div class="filter">
+            <label for="language">Language</label>
+            <select id="language">
+              <option value="en" selected>English</option>
+              <option value="es">Spanish</option>
+              <option value="de">German</option>
+              <option value="fr">French</option>
+            </select>
+          </div>
+          <div class="filter">
+            <label for="duration">Length</label>
+            <select id="duration">
+              <option value="any">Any</option>
+              <option value="short">Short (&lt;4m)</option>
+              <option value="medium">Medium (4–20m)</option>
+              <option value="long">Long (&gt;20m)</option>
+            </select>
+          </div>
+          <label
+            class="toggle"
+            title="On: keyword must appear in the title. Off: matches title or description (catches hashtags)."
+          >
+            <input type="checkbox" id="titleOnly" />
+            <span class="box"></span>
+            <span class="txt">Title-only match</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="statusbar">
+        <div class="meta" id="statusMeta"></div>
+        <button class="export" id="exportBtn" disabled>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <path d="M7 10l5 5 5-5" />
+            <path d="M12 15V3" />
+          </svg>
+          Export CSV
+        </button>
+      </div>
+
+      <div class="grid" id="output">
+        <div class="state">
+          <div class="big">Start a search</div>
+          Enter a keyword above to find matching videos.
+        </div>
+      </div>
     </div>
-    <div>
-      <h1>YouTube Video Search</h1>
-      <div class="tagline">Search video titles by keyword for content research</div>
-    </div>
-  </header>
 
-  <div class="search-card">
-    <div class="search-row">
-      <div class="input-shell">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
-        </svg>
-        <input type="text" id="keyword" placeholder="Search a keyword in video titles…" autocomplete="off" />
-      </div>
-      <button class="run" id="runBtn">Search</button>
-    </div>
+    <script>
+      // ── Configuration ─────────────────────────────────────────────
+      // Swap this for your real n8n production webhook URL once the workflow is live.
+      const WEBHOOK_URL =
+        "https://n8n-smartmarketer.duckdns.org/webhook/yt-search";
+      // ──────────────────────────────────────────────────────────────
 
-    <div class="filters">
-      <div class="filter">
-        <label for="order">Sort by</label>
-        <select id="order">
-          <option value="relevance">Relevance</option>
-          <option value="viewCount">Views</option>
-          <option value="date">Newest</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="dateRange">Published</label>
-        <select id="dateRange">
-          <option value="">Any time</option>
-          <option value="7">Past week</option>
-          <option value="30">Past month</option>
-          <option value="365">Past year</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="maxResults">Fetch up to</label>
-        <select id="maxResults">
-          <option value="25">25</option>
-          <option value="50" selected>50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="minViews">Min views</label>
-        <select id="minViews">
-          <option value="0">Any</option>
-          <option value="10000">10K+</option>
-          <option value="100000">100K+</option>
-          <option value="1000000">1M+</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="duration">Length</label>
-        <select id="duration">
-          <option value="any">Any</option>
-          <option value="short">Short (&lt;4m)</option>
-          <option value="medium">Medium (4–20m)</option>
-          <option value="long">Long (&gt;20m)</option>
-        </select>
-      </div>
-      <label class="toggle" title="On: keyword must appear in the title. Off: matches title or description (catches hashtags).">
-        <input type="checkbox" id="titleOnly" />
-        <span class="box"></span>
-        <span class="txt">Title-only match</span>
-      </label>
-    </div>
-  </div>
+      const $ = (id) => document.getElementById(id);
+      const output = $("output");
+      const statusMeta = $("statusMeta");
+      const exportBtn = $("exportBtn");
+      const runBtn = $("runBtn");
 
-  <div class="statusbar">
-    <div class="meta" id="statusMeta"></div>
-    <button class="export" id="exportBtn" disabled>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
-      </svg>
-      Export CSV
-    </button>
-  </div>
+      let currentRows = [];
+      let currentKeyword = "";
 
-  <div class="grid" id="output">
-    <div class="state">
-      <div class="big">Start a search</div>
-      Enter a keyword above to find matching videos.
-    </div>
-  </div>
-</div>
+      function fmtViews(n) {
+        if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + "M";
+        if (n >= 1e3) return (n / 1e3).toFixed(n >= 1e4 ? 0 : 1) + "K";
+        return String(n);
+      }
+      function fmtDate(iso) {
+        const d = new Date(iso);
+        if (isNaN(d)) return "—";
+        return d.toISOString().slice(0, 10);
+      }
+      function esc(s) {
+        return String(s).replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+      }
 
-<script>
-  // ── Configuration ─────────────────────────────────────────────
-  // Swap this for your real n8n production webhook URL once the workflow is live.
-  const WEBHOOK_URL = "https://n8n-smartmarketer.duckdns.org/webhook/yt-search";
-  // ──────────────────────────────────────────────────────────────
+      function setState(bigText, subText, isErr) {
+        output.innerHTML = `<div class="state${isErr ? " err" : ""}"><div class="big">${bigText}</div>${subText}</div>`;
+      }
 
-  const $ = (id) => document.getElementById(id);
-  const output = $("output");
-  const statusMeta = $("statusMeta");
-  const exportBtn = $("exportBtn");
-  const runBtn = $("runBtn");
-
-  let currentRows = [];
-  let currentKeyword = "";
-
-  function fmtViews(n) {
-    if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + "M";
-    if (n >= 1e3) return (n / 1e3).toFixed(n >= 1e4 ? 0 : 1) + "K";
-    return String(n);
-  }
-  function fmtDate(iso) {
-    const d = new Date(iso);
-    if (isNaN(d)) return "—";
-    return d.toISOString().slice(0, 10);
-  }
-  function esc(s) {
-    return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  }
-
-  function setState(bigText, subText, isErr) {
-    output.innerHTML = `<div class="state${isErr ? " err" : ""}"><div class="big">${bigText}</div>${subText}</div>`;
-  }
-
-  function renderGrid(rows) {
-    if (!rows.length) {
-      setState("No matches", "Try turning off title-only match, lowering min views, or a broader keyword.");
-      return;
-    }
-    output.innerHTML = rows.map(r => `
+      function renderGrid(rows) {
+        if (!rows.length) {
+          setState(
+            "No matches",
+            "Try turning off title-only match, lowering min views, or a broader keyword.",
+          );
+          return;
+        }
+        output.innerHTML = rows
+          .map(
+            (r) => `
       <div class="video">
         <a class="thumb" href="${esc(r.url)}" target="_blank" rel="noopener">
           ${r.thumbnail ? `<img src="${esc(r.thumbnail)}" alt="" loading="lazy" />` : ""}
@@ -459,78 +634,100 @@
             <span>${fmtDate(r.publishedAt)}</span>
           </div>
         </div>
-      </div>`).join("");
-  }
+      </div>`,
+          )
+          .join("");
+      }
 
-  async function runSearch() {
-    const keyword = $("keyword").value.trim();
-    if (!keyword) { $("keyword").focus(); return; }
+      async function runSearch() {
+        const keyword = $("keyword").value.trim();
+        if (!keyword) {
+          $("keyword").focus();
+          return;
+        }
 
-    const payload = {
-      keyword,
-      order: $("order").value,
-      maxResults: parseInt($("maxResults").value, 10),
-      minViews: parseInt($("minViews").value, 10),
-      duration: $("duration").value,
-      titleOnly: $("titleOnly").checked,
-      publishedAfterDays: $("dateRange").value ? parseInt($("dateRange").value, 10) : null
-    };
+        const payload = {
+          keyword,
+          order: $("order").value,
+          maxResults: parseInt($("maxResults").value, 10),
+          minViews: parseInt($("minViews").value, 10),
+          duration: $("duration").value,
+          language: $("language").value,
+          titleOnly: $("titleOnly").checked,
+          publishedAfterDays: $("dateRange").value
+            ? parseInt($("dateRange").value, 10)
+            : null,
+        };
 
-    runBtn.disabled = true;
-    exportBtn.disabled = true;
-    statusMeta.textContent = "";
-    output.innerHTML = `<div class="state"><span class="spinner"></span>Searching “${esc(keyword)}”…</div>`;
+        runBtn.disabled = true;
+        exportBtn.disabled = true;
+        statusMeta.textContent = "";
+        output.innerHTML = `<div class="state"><span class="spinner"></span>Searching “${esc(keyword)}”…</div>`;
 
-    try {
-      const res = await fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        try {
+          const res = await fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error("Webhook returned " + res.status);
+          const data = await res.json();
+          const rows = data.results || [];
+
+          currentRows = rows;
+          currentKeyword = keyword;
+          renderGrid(rows);
+
+          const tags = [];
+          if (payload.titleOnly) tags.push("title-only");
+          if (payload.minViews)
+            tags.push(fmtViews(payload.minViews) + "+ views");
+          if (payload.duration !== "any") tags.push(payload.duration);
+          const tagStr = tags.length ? " · " + tags.join(" · ") : "";
+          statusMeta.innerHTML = `<b>${rows.length}</b> of ${payload.maxResults} fetched matched for “${esc(keyword)}”${tagStr}`;
+          exportBtn.disabled = rows.length === 0;
+        } catch (err) {
+          setState(
+            "Couldn't reach the search workflow",
+            `Check that the webhook URL is set and the n8n workflow is active.<br><span style="opacity:0.7">${esc(err.message)}</span>`,
+            true,
+          );
+        } finally {
+          runBtn.disabled = false;
+        }
+      }
+
+      function exportCSV() {
+        if (!currentRows.length) return;
+        const header = ["title", "channel", "published", "views", "url"];
+        const lines = [header.join(",")];
+        for (const r of currentRows) {
+          const cells = [
+            r.title,
+            r.channel,
+            fmtDate(r.publishedAt),
+            r.views,
+            r.url,
+          ].map((v) => `"${String(v).replace(/"/g, '""')}"`);
+          lines.push(cells.join(","));
+        }
+        const blob = new Blob([lines.join("\n")], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const stamp = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `youtube-search_${currentKeyword.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}_${stamp}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      runBtn.addEventListener("click", runSearch);
+      exportBtn.addEventListener("click", exportCSV);
+      $("keyword").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") runSearch();
       });
-      if (!res.ok) throw new Error("Webhook returned " + res.status);
-      const data = await res.json();
-      const rows = data.results || [];
-
-      currentRows = rows;
-      currentKeyword = keyword;
-      renderGrid(rows);
-
-      const tags = [];
-      if (payload.titleOnly) tags.push("title-only");
-      if (payload.minViews) tags.push(fmtViews(payload.minViews) + "+ views");
-      if (payload.duration !== "any") tags.push(payload.duration);
-      const tagStr = tags.length ? " · " + tags.join(" · ") : "";
-      statusMeta.innerHTML = `<b>${rows.length}</b> of ${payload.maxResults} fetched matched for “${esc(keyword)}”${tagStr}`;
-      exportBtn.disabled = rows.length === 0;
-    } catch (err) {
-      setState("Couldn't reach the search workflow", `Check that the webhook URL is set and the n8n workflow is active.<br><span style="opacity:0.7">${esc(err.message)}</span>`, true);
-    } finally {
-      runBtn.disabled = false;
-    }
-  }
-
-  function exportCSV() {
-    if (!currentRows.length) return;
-    const header = ["title", "channel", "published", "views", "url"];
-    const lines = [header.join(",")];
-    for (const r of currentRows) {
-      const cells = [r.title, r.channel, fmtDate(r.publishedAt), r.views, r.url]
-        .map(v => `"${String(v).replace(/"/g, '""')}"`);
-      lines.push(cells.join(","));
-    }
-    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const stamp = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `youtube-search_${currentKeyword.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}_${stamp}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  runBtn.addEventListener("click", runSearch);
-  exportBtn.addEventListener("click", exportCSV);
-  $("keyword").addEventListener("keydown", e => { if (e.key === "Enter") runSearch(); });
-</script>
-</body>
+    </script>
+  </body>
 </html>
