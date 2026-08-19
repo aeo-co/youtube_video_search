@@ -356,6 +356,98 @@
         padding-right: 2px;
       }
 
+      /* ---- find questions ---- */
+      .q-subtabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 18px;
+      }
+      .q-subtab {
+        background: var(--bg);
+        border: 1.5px solid var(--line);
+        border-radius: 20px;
+        color: var(--ink-dim);
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 7px 16px;
+        cursor: pointer;
+        transition: all 0.14s;
+      }
+      .q-subtab:hover {
+        color: var(--ink-2);
+        border-color: #3a3f4c;
+      }
+      .q-subtab.active {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .theme-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px 20px;
+        margin-bottom: 14px;
+      }
+      .theme-head {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line-2);
+      }
+      .theme-name {
+        font-size: 15px;
+        font-weight: 650;
+        color: var(--ink);
+      }
+      .theme-count {
+        font-size: 11.5px;
+        font-weight: 650;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 2px 9px;
+        border-radius: 20px;
+      }
+      .q-item {
+        display: flex;
+        gap: 10px;
+        padding: 8px 0;
+        align-items: flex-start;
+      }
+      .q-item:not(:last-child) {
+        border-bottom: 1px solid var(--line-2);
+      }
+      .q-bullet {
+        color: var(--accent);
+        font-weight: 700;
+        line-height: 1.5;
+        flex-shrink: 0;
+      }
+      .q-body {
+        flex: 1;
+      }
+      .q-text {
+        font-size: 13.5px;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+      .q-src {
+        font-size: 11.5px;
+        margin-top: 2px;
+      }
+      .q-src a {
+        color: var(--ink-dim);
+        text-decoration: none;
+      }
+      .q-src a:hover {
+        color: var(--link);
+      }
+
       .statusbar {
         display: flex;
         align-items: center;
@@ -663,6 +755,13 @@
         <button class="tab" data-mode="urls" onclick="switchMode('urls')">
           Comments by URL
         </button>
+        <button
+          class="tab"
+          data-mode="questions"
+          onclick="switchMode('questions')"
+        >
+          Find Questions
+        </button>
       </div>
 
       <div id="searchMode">
@@ -849,6 +948,119 @@
           </div>
         </div>
       </div>
+
+      <div id="questionsMode" style="display: none">
+        <div class="search-card">
+          <div class="q-subtabs">
+            <button
+              class="q-subtab active"
+              data-qmode="topic"
+              onclick="setQMode('topic')"
+            >
+              By topic
+            </button>
+            <button
+              class="q-subtab"
+              data-qmode="channels"
+              onclick="setQMode('channels')"
+            >
+              By channels
+            </button>
+          </div>
+
+          <div id="qTopicPane">
+            <div class="input-shell" style="margin-bottom: 14px">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4.3-4.3" />
+              </svg>
+              <input
+                type="text"
+                id="qTopic"
+                placeholder="Topic to find questions about (e.g. brain fog)"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <div id="qChannelsPane" style="display: none">
+            <label class="url-label" for="qChannels"
+              >YouTube channels — one per line (channel URL, @handle, or
+              /channel/ID)</label
+            >
+            <textarea
+              id="qChannels"
+              class="url-input"
+              rows="4"
+              placeholder="https://www.youtube.com/@Menopause&#10;@DrBrainHealth&#10;https://www.youtube.com/channel/UCxxxxxxxxxxxxxxxxxxxxxx"
+            ></textarea>
+          </div>
+
+          <div class="filters" style="margin-top: 16px">
+            <div class="filter">
+              <label for="qMaxVideos">Scan up to</label>
+              <select id="qMaxVideos">
+                <option value="5">5 videos</option>
+                <option value="10" selected>10 videos</option>
+                <option value="20">20 videos</option>
+              </select>
+            </div>
+            <label
+              class="toggle"
+              title="On: only questions actually about the topic. Off: every genuine question found."
+            >
+              <input type="checkbox" id="qRelevantOnly" checked />
+              <span class="box"></span>
+              <span class="txt">Only questions about the topic</span>
+            </label>
+            <button
+              class="run"
+              id="qFindBtn"
+              onclick="findQuestions()"
+              style="margin-left: auto; padding: 11px 22px"
+            >
+              Find questions
+            </button>
+          </div>
+        </div>
+
+        <div class="statusbar">
+          <div class="meta" id="qStatusMeta"></div>
+          <button
+            class="export"
+            id="qExportBtn"
+            disabled
+            onclick="exportQuestions()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <path d="M7 10l5 5 5-5" />
+              <path d="M12 15V3" />
+            </svg>
+            Export questions
+          </button>
+        </div>
+        <div id="qOutput">
+          <div class="state">
+            <div class="big">Find real questions</div>
+            Pick a topic or channels, and pull the questions people are actually
+            asking in the comments.
+          </div>
+        </div>
+      </div>
     </div>
     <!-- /wrap -->
 
@@ -858,6 +1070,11 @@
       const WEBHOOK_URL = "https://n8n-smartmarketer.duckdns.org/webhook/yt-search";
       // Comments use a second webhook on the same n8n host (path: yt-comments).
       const COMMENTS_URL = WEBHOOK_URL.replace(/\/yt-search$/, "/yt-comments");
+      // Find Questions uses a third webhook (path: yt-questions).
+      const QUESTIONS_URL = WEBHOOK_URL.replace(
+        /\/yt-search$/,
+        "/yt-questions",
+      );
       // ──────────────────────────────────────────────────────────────
 
       const $ = (id) => document.getElementById(id);
@@ -1114,11 +1331,130 @@
       function switchMode(mode) {
         $("searchMode").style.display = mode === "search" ? "" : "none";
         $("urlsMode").style.display = mode === "urls" ? "" : "none";
+        $("questionsMode").style.display = mode === "questions" ? "" : "none";
         document
           .querySelectorAll(".tab")
           .forEach((t) =>
             t.classList.toggle("active", t.dataset.mode === mode),
           );
+      }
+
+      // ── Find Questions ────────────────────────────────────────────
+      let qMode = "topic";
+      let questionThemes = [];
+      let questionMeta = {};
+
+      function setQMode(m) {
+        qMode = m;
+        $("qTopicPane").style.display = m === "topic" ? "" : "none";
+        $("qChannelsPane").style.display = m === "channels" ? "" : "none";
+        document
+          .querySelectorAll(".q-subtab")
+          .forEach((t) => t.classList.toggle("active", t.dataset.qmode === m));
+      }
+
+      async function findQuestions() {
+        const topic = $("qTopic").value.trim();
+        const channels = $("qChannels")
+          .value.split(/[\n,]+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        if (qMode === "topic" && !topic) {
+          $("qTopic").focus();
+          return;
+        }
+        if (qMode === "channels" && !channels.length) {
+          $("qChannels").focus();
+          return;
+        }
+
+        const payload = {
+          mode: qMode,
+          topic,
+          channels,
+          maxVideos: parseInt($("qMaxVideos").value, 10),
+          relevantOnly: $("qRelevantOnly").checked,
+        };
+
+        const btn = $("qFindBtn");
+        btn.disabled = true;
+        $("qExportBtn").disabled = true;
+        $("qStatusMeta").textContent = "";
+        $("qOutput").innerHTML =
+          `<div class="state"><span class="spinner"></span>Scanning videos, reading comments, and extracting questions… this can take a minute.</div>`;
+
+        try {
+          const res = await fetch(QUESTIONS_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error("Webhook returned " + res.status);
+          const data = await res.json();
+          questionThemes = data.themes || [];
+          questionMeta = data;
+          renderQuestions();
+
+          if (!questionThemes.length) {
+            $("qStatusMeta").textContent = data.note || "No questions found.";
+          } else {
+            $("qStatusMeta").innerHTML =
+              `<b>${data.totalQuestions}</b> questions in ${questionThemes.length} theme${questionThemes.length === 1 ? "" : "s"} · scanned ${data.videosScanned} video${data.videosScanned === 1 ? "" : "s"}`;
+            $("qExportBtn").disabled = false;
+          }
+        } catch (err) {
+          $("qOutput").innerHTML =
+            `<div class="state err"><div class="big">Couldn't find questions</div>Check that the workflow is active and your OpenAI key is set in n8n.<br><span style="opacity:0.7">${esc(err.message)}</span></div>`;
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      function renderQuestions() {
+        if (!questionThemes.length) {
+          $("qOutput").innerHTML =
+            `<div class="state"><div class="big">No questions found</div>Try a broader topic, more videos, or turn off the topic-relevance filter.</div>`;
+          return;
+        }
+        $("qOutput").innerHTML = questionThemes
+          .map(
+            (t) => `
+      <div class="theme-card">
+        <div class="theme-head">
+          <span class="theme-name">${esc(t.theme)}</span>
+          <span class="theme-count">${t.questions.length}</span>
+        </div>
+        ${t.questions
+          .map(
+            (q) => `
+          <div class="q-item">
+            <span class="q-bullet">›</span>
+            <div class="q-body">
+              <div class="q-text">${esc(q.q)}</div>
+              ${q.url ? `<div class="q-src"><a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.video || "source")} ↗</a></div>` : ""}
+            </div>
+          </div>`,
+          )
+          .join("")}
+      </div>`,
+          )
+          .join("");
+      }
+
+      function exportQuestions() {
+        const header = ["theme", "question", "source_video", "video_url"];
+        const lines = [header.join(",")];
+        for (const t of questionThemes) {
+          for (const q of t.questions) {
+            lines.push(csvRow([t.theme, q.q, q.video || "", q.url || ""]));
+          }
+        }
+        const stamp = new Date().toISOString().slice(0, 10);
+        const tag = (questionMeta.topic || questionMeta.mode || "questions")
+          .replace(/[^a-z0-9]+/gi, "-")
+          .toLowerCase();
+        downloadCSV(lines, `youtube-questions_${tag}_${stamp}.csv`);
       }
 
       // ── Export with comments (search results) ─────────────────────
